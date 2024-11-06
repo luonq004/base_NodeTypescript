@@ -1,5 +1,5 @@
-import fs from "fs";
 import { Db } from "./types";
+import fs from "fs";
 
 export const getDb = async (): Promise<Db> => {
   const content = fs.readFileSync("./db.json", "utf-8");

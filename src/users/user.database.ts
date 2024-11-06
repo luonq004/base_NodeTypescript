@@ -1,40 +1,32 @@
+import { hash } from "bcrypt";
+import { v4 as uuid } from "uuid";
+import { getDb, updateDb } from "../../dbManager";
 import { UnsavedUser, User, UserChanges } from "../../types";
 
-import { v4 as uuid } from "uuid";
-import { hash } from "bcrypt";
-import { getDb, updateDb } from "../../dbManager";
-
 export const findAll = async (): Promise<User[]> => {
-  const data = await getDb();
-  return data.users;
+  const db = await getDb();
+  return db.users;
 };
 
-export const findByEmail = async (email: string): Promise<null | User> => {
+export const findByEmail = async (email: string): Promise<User | null> => {
   const users = await findAll();
-
   const user = users.find((user) => user.email === email);
-
   return user ?? null;
 };
 
-export const findById = async (id: string): Promise<null | User> => {
+export const findById = async (id: string): Promise<User | null> => {
   const users = await findAll();
-
   const user = users.find((user) => user.id === id);
-
   return user ?? null;
 };
 
-export const create = async (
-  unsavedUser: UnsavedUser
-): Promise<User | null> => {
+export const create = async (unsavedUser: UnsavedUser): Promise<User> => {
   const hashedPassword = await hash(unsavedUser.password, 10);
   const userToCreate: User = {
     ...unsavedUser,
     id: uuid(),
     password: hashedPassword,
   };
-
   const db = await getDb();
   const updatedDb = {
     ...db,
@@ -54,18 +46,15 @@ export const update = async (
   if (!userToUpdate) {
     throw new Error("User doesnt exist");
   }
-
   let hashedPassword = userToUpdate.password;
   if (userChanges.password) {
     hashedPassword = await hash(userChanges.password, 10);
   }
-
   const updatedUser: User = {
     ...userToUpdate,
     ...userChanges,
     password: hashedPassword,
   };
-
   const db = await getDb();
   const updatedDb = {
     ...db,
@@ -87,7 +76,6 @@ export const remove = async (id: string): Promise<void> => {
   if (!userToRemove) {
     throw new Error("User doesnt exist");
   }
-
   const db = await getDb();
   const updatedDb = {
     ...db,
