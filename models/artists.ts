@@ -1,5 +1,5 @@
 import { Artist, ArtistWithoutId } from "../types/artist";
-import * as db from "../db";
+import * as db from "../dbManager";
 import { DeleteResult, ObjectId } from "mongodb";
 
 export const all = (): Promise<Artist[]> => {
